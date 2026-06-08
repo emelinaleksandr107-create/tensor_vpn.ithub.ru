@@ -139,41 +139,25 @@
     <div class="bg-glow bg-glow-2"></div>
     <div class="bg-glow bg-glow-3"></div>
 
-    <!-- Модальное окно -->
     <div class="modal-overlay" id="authModal">
         <div class="modal">
             <button class="modal-close" onclick="closeAuth()">✕</button>
             <h2 id="modalTitle">Войти</h2>
             <p class="sub" id="modalSub">Добро пожаловать обратно</p>
             <form id="authForm" onsubmit="return handleAuth(event)">
-                <div class="form-group" id="nameGroup" style="display:none;">
-                    <label>Имя</label>
-                    <input type="text" id="regName" placeholder="Как тебя зовут?" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="authEmail" placeholder="tensor@example.com" required autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label>Пароль</label>
-                    <input type="password" id="authPassword" placeholder="Минимум 6 символов" required minlength="6" autocomplete="off">
-                </div>
+                <div class="form-group" id="nameGroup" style="display:none;"><label>Имя</label><input type="text" id="regName" placeholder="Как тебя зовут?" autocomplete="off"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="authEmail" placeholder="tensor@example.com" required autocomplete="off"></div>
+                <div class="form-group"><label>Пароль</label><input type="password" id="authPassword" placeholder="Минимум 6 символов" required minlength="6" autocomplete="off"></div>
                 <p class="error-msg" id="authError"></p>
                 <button type="submit" class="btn btn-primary" id="authSubmitBtn">Войти</button>
             </form>
-            <p class="switch" id="switchText">
-                Нет аккаунта? <a onclick="toggleAuthMode()">Зарегистрироваться</a>
-            </p>
+            <p class="switch" id="switchText">Нет аккаунта? <a onclick="toggleAuthMode()">Зарегистрироваться</a></p>
         </div>
     </div>
 
-    <!-- Шапка -->
     <header>
         <div class="container">
-            <div class="logo" onclick="navigateTo('home')">
-                <div class="logo-icon">⚡</div>
-                Tensor VPN
-            </div>
+            <div class="logo" onclick="navigateTo('home')"><div class="logo-icon">⚡</div>Tensor VPN</div>
             <nav class="nav-links" id="navLinks">
                 <a onclick="navigateTo('home')" class="active" data-page="home">Главная</a>
                 <a onclick="navigateTo('news')" data-page="news">Новости</a>
@@ -182,24 +166,17 @@
                 <a class="btn btn-outline btn-sm" id="authBtn" onclick="openAuth()">Войти</a>
                 <a class="btn btn-primary btn-sm" id="regBtn" onclick="openAuth('reg')">Регистрация</a>
             </nav>
-            <div class="user-badge" id="userBadge" onclick="logout()">
-                <div class="user-avatar" id="userAvatar">T</div>
-                <span class="user-name" id="userNameDisplay">Пользователь</span>
-            </div>
+            <div class="user-badge" id="userBadge" onclick="logout()"><div class="user-avatar" id="userAvatar">T</div><span class="user-name" id="userNameDisplay">Пользователь</span></div>
         </div>
     </header>
 
-    <!-- Главная -->
     <div class="page active" id="page-home">
         <section class="hero">
             <div class="container">
                 <div class="hero-badge"><span class="dot"></span> Более 300 активных пользователей</div>
                 <h1>Загрузи свободу<br>с Tensor VPN</h1>
                 <p>Быстрый, анонимный и недорогой VPN для молодёжи. YouTube, Telegram, TikTok и другие сервисы, заблокированные в России — без лагов, рекламы и слежки.</p>
-                <div class="hero-buttons">
-                    <a class="btn btn-primary btn-lg" onclick="navigateTo('pricing')">⚡ Выбрать тариф</a>
-                    <a class="btn btn-outline btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Узнать больше ↓</a>
-                </div>
+                <div class="hero-buttons"><a class="btn btn-primary btn-lg" onclick="navigateTo('pricing')">⚡ Выбрать тариф</a><a class="btn btn-outline btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Узнать больше ↓</a></div>
             </div>
         </section>
         <section class="features" id="features">
@@ -218,7 +195,6 @@
         </section>
     </div>
 
-    <!-- Новости -->
     <div class="page" id="page-news">
         <section class="news">
             <div class="container">
@@ -227,16 +203,12 @@
                 <div class="news-grid">
                     <div class="news-card"><div class="news-date">08.06.2026</div><h3>Запуск новых серверов в Москве</h3><p>Добавили два новых сервера. Пинг снизился на 40%, скорость до 1 Гбит/с.</p><span class="news-tag">Серверы</span></div>
                     <div class="news-card"><div class="news-date">05.06.2026</div><h3>ChatGPT снова доступен на Pro</h3><p>Обновили протоколы. ChatGPT и другие нейросети работают стабильно.</p><span class="news-tag">Нейросети</span></div>
-                    <div class="news-card"><div class="news-date">01.06.2026</div><h3>Tensor VPN на Android TV</h3><p>Приложение для телевизоров. YouTube на большом экране без танцев с бубном.</p><span class="news-tag">Релиз</span></div>
-                    <div class="news-card"><div class="news-date">28.05.2026</div><h3>Обновление WireGuard</h3><p>Новая версия шифрования — ещё быстрее, расход батареи снижен на 15%.</p><span class="news-tag">Технологии</span></div>
-                    <div class="news-card"><div class="news-date">20.05.2026</div><h3>Рефералка: 100 участников</h3><p>Первые 100 человек уже получили бесплатные минуты Pro за друзей.</p><span class="news-tag">Акции</span></div>
-                    <div class="news-card"><div class="news-date">15.05.2026</div><h3>Статья про No Logs на Хабре</h3><p>Разбор, почему мы не храним логи и как это проверено технически.</p><span class="news-tag">СМИ</span></div>
+                    <div class="news-card"><div class="news-date">01.06.2026</div><h3>Tensor VPN на Android TV</h3><p>Приложение для телевизоров. YouTube на большом экране.</p><span class="news-tag">Релиз</span></div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- Тарифы -->
     <div class="page" id="page-pricing">
         <section class="pricing">
             <div class="container">
@@ -252,7 +224,6 @@
         </section>
     </div>
 
-    <!-- Сравнение -->
     <div class="page" id="page-compare">
         <section class="compare">
             <div class="container">
@@ -275,48 +246,33 @@
         </section>
     </div>
 
-    <!-- Призыв к действию -->
     <section class="cta">
-        <div class="container">
-            <div class="cta-card">
-                <h2>Готов загрузить свободу? 🚀</h2>
-                <p>Подключи Tensor VPN за 2 минуты. Без логов, без рекламы, без тормозов.</p>
-                <a class="btn btn-primary btn-lg" onclick="navigateTo('pricing')">⚡ Выбрать тариф</a>
-            </div>
-        </div>
+        <div class="container"><div class="cta-card"><h2>Готов загрузить свободу? 🚀</h2><p>Подключи Tensor VPN за 2 минуты. Без логов, без рекламы, без тормозов.</p><a class="btn btn-primary btn-lg" onclick="navigateTo('pricing')">⚡ Выбрать тариф</a></div></div>
     </section>
 
-    <!-- Футер -->
-    <footer>
-        <div class="container">
-            <p>© 2026 Tensor VPN. Все права защищены. | <a href="#">Политика конфиденциальности</a> | <a href="#">Оферта</a></p>
-            <p style="margin-top:6px;">Сделано с любовью для свободного интернета 💜</p>
-        </div>
-    </footer>
+    <footer><div class="container"><p>© 2026 Tensor VPN. | <a href="#">Политика конфиденциальности</a> | <a href="#">Оферта</a></p><p style="margin-top:6px;">Сделано с любовью для свободного интернета 💜</p></div></footer>
 
     <script>
-        function navigateTo(pageName) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            var target = document.getElementById('page-' + pageName);
-            if (target) target.classList.add('active');
+        function navigateTo(p) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            var t = document.getElementById('page-' + p);
+            if (t) t.classList.add('active');
             document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
-            var navLink = document.querySelector('.nav-links a[data-page="' + pageName + '"]');
-            if (navLink) navLink.classList.add('active');
+            var n = document.querySelector('.nav-links a[data-page="' + p + '"]');
+            if (n) n.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        var isRegMode = false;
-
-        function openAuth(mode) {
-            if (mode === 'reg') {
-                isRegMode = true;
+        var isReg = false;
+        function openAuth(m) {
+            if (m === 'reg') {
+                isReg = true;
                 document.getElementById('modalTitle').textContent = 'Регистрация';
                 document.getElementById('modalSub').textContent = 'Создай аккаунт за 30 секунд';
                 document.getElementById('nameGroup').style.display = 'block';
                 document.getElementById('authSubmitBtn').textContent = 'Зарегистрироваться';
                 document.getElementById('switchText').innerHTML = 'Уже есть аккаунт? <a onclick="toggleAuthMode()">Войти</a>';
             } else {
-                isRegMode = false;
+                isReg = false;
                 document.getElementById('modalTitle').textContent = 'Войти';
                 document.getElementById('modalSub').textContent = 'Добро пожаловать обратно';
                 document.getElementById('nameGroup').style.display = 'none';
@@ -327,21 +283,29 @@
             document.getElementById('authError').style.display = 'none';
             document.getElementById('authForm').reset();
         }
-
-        function closeAuth() {
-            document.getElementById('authModal').classList.remove('open');
+        function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
+        function toggleAuthMode() { openAuth(isReg ? 'login' : 'reg'); }
+        function handleAuth(e) {
+            e.preventDefault();
+            var em = document.getElementById('authEmail').value.trim();
+            var pw = document.getElementById('authPassword').value;
+            var nm = isReg ? document.getElementById('regName').value.trim() : em.split('@')[0];
+            if (!em || !pw) { document.getElementById('authError').textContent = 'Заполни все поля'; document.getElementById('authError').style.display = 'block'; return false; }
+            if (isReg && !nm) { document.getElementById('authError').textContent = 'Введи имя'; document.getElementById('authError').style.display = 'block'; return false; }
+            if (pw.length < 6) { document.getElementById('authError').textContent = 'Минимум 6 символов'; document.getElementById('authError').style.display = 'block'; return false; }
+            localStorage.setItem('tensorUser', JSON.stringify({ name: nm, email: em }));
+            updateUI(nm);
+            closeAuth();
+            navigateTo('home');
+            return false;
         }
-
-        function toggleAuthMode() {
-            if (isRegMode) {
-                openAuth('login');
+        function logout() { localStorage.removeItem('tensorUser'); updateUI(null); navigateTo('home'); }
+        function updateUI(u) {
+            var b = document.getElementById('userBadge');
+            var ab = document.getElementById('authBtn');
+            var rb = document.getElementById('regBtn');
+            if (u) {
+                document.getElementById('userNameDisplay').textContent = u;
+                document.getElementById('userAvatar').textContent = u.charAt(0).toUpperCase();
+                b.style.display = 'flex'; ab.style.display = 'none'; rb.style.display = 'none';
             } else {
-                openAuth('reg');
-            }
-        }
-
-        function handleAuth(event) {
-            event.preventDefault();
-            var email = document.getElementById('authEmail').value.trim();
-            var password = document.getElementById('authPassword').value;
-            var name = isRegMode ? document.getElementById('regName

@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensor VPN — Загрузи свободу</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13 2L4 14h7l-1 8 9-12h-7l1-8z' fill='%238b5cf6' stroke='%238b5cf6' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121d;
+            --surface2: #1a1a2e;
+            --primary: #8b5cf6;
+            --primary-glow: #a78bfa;
+            --accent: #22c55e;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #2a2a3e;
+            --gradient: linear-gradient(135deg, #8b5cf6, #6366f1);
+            --gradient-card: linear-gradient(180deg, #1a1a2e 0%, #12121d 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .bg-glow { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.15; pointer-events: none; z-index: 0; }
+        .bg-glow-1 { width: 600px; height: 600px; background: #8b5cf6; top: -200px; right: -200px; }
+        .bg-glow-2 { width: 500px; height: 500px; background: #6366f1; bottom: -150px; left: -150px; }
+        .bg-glow-3 { width: 400px; height: 400px; background: #22c55e; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.06; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+        header { padding: 20px 0; position: sticky; top: 0; z-index: 100; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+        header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 800; font-size: 22px; letter-spacing: -0.5px; cursor: pointer; }
+        .logo-icon { width: 36px; height: 36px; background: var(--gradient); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); flex-shrink: 0; }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 15px; transition: color 0.2s; cursor: pointer; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text); }
+        .nav-links a.active { color: var(--primary-glow); font-weight: 600; }
+        .btn { padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.25s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--gradient); color: #fff; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35); }
+        .btn-primary:hover { box-shadow: 0 6px 30px rgba(139, 92, 246, 0.55); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.08); }
+        .btn-lg { padding: 14px 32px; font-size: 16px; border-radius: 14px; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+        .btn-success { background: var(--accent); color: #fff; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.35); }
+        .btn-success:hover { box-shadow: 0 6px 30px rgba(34, 197, 94, 0.55); transform: translateY(-1px); }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { opacity: 0.85; }
+        .cart-btn { position: relative; background: transparent; border: 1px solid var(--border); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 18px; }
+        .cart-btn:hover { border-color: var(--primary); }
+        .cart-badge { position: absolute; top: -4px; right: -4px; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; }
+        .cart-badge.show { display: flex; }
+        .user-badge { display: none; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 14px 6px 6px; border-radius: 50px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+        .user-badge:hover { border-color: var(--primary); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gradient); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
+        .user-name { font-weight: 600; font-size: 14px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .hero { padding: 80px 0 60px; text-align: center; position: relative; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 50px; padding: 8px 18px; font-size: 13px; font-weight: 500; color: var(--primary-glow); margin-bottom: 28px; }
+        .hero-badge .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent); } 50% { opacity: 0.4; box-shadow: 0 0 12px var(--accent); } }
+        .hero h1 { font-size: clamp(36px, 6vw, 64px); font-weight: 900; line-height: 1.15; letter-spacing: -1.5px; margin-bottom: 20px; background: linear-gradient(135deg, #f1f5f9 0%, #a78bfa 50%, #c4b5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero p { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 36px; }
+        .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .features { padding: 60px 0; }
+        .section-label { text-transform: uppercase; letter-spacing: 3px; font-size: 12px; font-weight: 700; color: var(--primary-glow); margin-bottom: 12px; }
+        .section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 800; margin-bottom: 48px; letter-spacing: -0.5px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .feature-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .feature-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gradient); opacity: 0; transition: opacity 0.3s; }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon { width: 48px; height: 48px; background: rgba(139, 92, 246, 0.15); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 18px; }
+        .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .feature-card p { font-size: 14px; color: var(--text-muted); }
+        .pricing { padding: 60px 0; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: stretch; }
+        .pricing-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 24px; padding: 36px 28px; transition: all 0.3s; position: relative; display: flex; flex-direction: column; }
+        .pricing-card:hover { border-color: var(--primary); box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5); }
+        .pricing-card.popular { border-color: var(--primary); background: var(--gradient-card); box-shadow: 0 0 40px rgba(139, 92, 246, 0.2); }
+        .popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--gradient); color: #fff; padding: 6px 20px; border-radius: 50px; font-size: 12px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4); }
+        .pricing-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .pricing-card .price { font-size: 42px; font-weight: 900; margin: 12px 0 4px; letter-spacing: -1px; }
+        .pricing-card .price span { font-size: 16px; font-weight: 500; color: var(--text-muted); }
+        .pricing-card .price-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .pricing-card ul { list-style: none; margin-bottom: 28px; flex-grow: 1; }
+        .pricing-card ul li { padding: 7px 0; font-size: 14px; color: var(--text-muted); display: flex; align-items: flex-start; gap: 10px; }
+        .pricing-card ul li::before { content: '✓'; color: var(--accent); font-weight: 700; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+        .pricing-card .btn { width: 100%; justify-content: center; }
+        .compare { padding: 60px 0; }
+        .compare-table { width: 100%; border-collapse: collapse; background: var(--surface2); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
+        .compare-table th, .compare-table td { padding: 16px 20px; text-align: left; font-size: 14px; }
+        .compare-table th { background: rgba(139, 92, 246, 0.1); font-weight: 700; color: var(--primary-glow); text-transform: uppercase; letter-spacing: 1px; font-size: 12px; }
+        .compare-table tr { border-bottom: 1px solid var(--border); }
+        .compare-table tr:last-child { border-bottom: none; }
+        .check { color: var(--accent); font-weight: 700; }
+        .cross { color: #ef4444; font-weight: 700; }
+        .news { padding: 60px 0; min-height: 60vh; }
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .news-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; transition: all 0.3s; }
+        .news-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); }
+        .news-date { font-size: 12px; color: var(--primary-glow); font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; }
+        .news-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .news-card p { font-size: 14px; color: var(--text-muted); }
+        .news-tag { display: inline-block; background: rgba(139, 92, 246, 0.2); color: var(--primary-glow); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-top: 12px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 200; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--surface2); border: 1px solid var(--border); border-radius: 24px; padding: 40px 32px; width: 100%; max-width: 420px; position: relative; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); max-height: 90vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .modal h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        .modal .sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
+        .form-group input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 15px; transition: border 0.2s; }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .modal .btn { width: 100%; justify-content: center; margin-top: 8px; }
+        .modal .switch { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+        .modal .switch a { color: var(--primary-glow); cursor: pointer; text-decoration: underline; }
+        .error-msg { color: #ef4444; font-size: 13px; margin-top: 4px; display: none; }
+        .cart-modal .modal { max-width: 480px; }
+        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-weight: 700; font-size: 15px; }
+        .cart-item-desc { font-size: 12px; color: var(--text-muted); }
+        .cart-item-price { font-weight: 700; font-size: 16px; color: var(--primary-glow); margin: 0 16px; white-space: nowrap; }
+        .cart-item-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px; transition: color 0.2s; }
+        .cart-item-remove:hover { color: #ef4444; }
+        .cart-total { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 8px; border-top: 1px solid var(--border); margin-top: 8px; }
+        .cart-total-label { font-size: 16px; color: var(--text-muted); }
+        .cart-total-price { font-size: 24px; font-weight: 900; }
+        .cart-empty { text-align: center; padding: 40px 0; color: var(--text-muted); }
+        .cart-empty .big-icon { font-size: 48px; margin-bottom: 16px; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--accent); border-radius: 16px; padding: 16px 24px; z-index: 300; display: none; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); animation: slideIn 0.3s ease; }
+        .toast.show { display: flex; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast-icon { font-size: 24px; }
+        .toast-text { font-size: 14px; }
+        .toast-text strong { color: var(--accent); }
+        .cta { padding: 80px 0; text-align: center; }
+        .cta-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 28px; padding: 56px 32px; position: relative; overflow: hidden; }
+        .cta-card::after { content: ''; position: absolute; width: 300px; height: 300px; background: #8b5cf6; filter: blur(150px); opacity: 0.1; top: -100px; right: -50px; border-radius: 50%; }
+        .cta-card h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 900; margin-bottom: 14px; position: relative; z-index: 1; }
+        .cta-card p { color: var(--text-muted); margin-bottom: 28px; position: relative; z-index: 1; }
+        .cta-card .btn { position: relative; z-index: 1; }
+        .app-prototype { padding: 60px 0; }
+        .app-layout { display: flex; align-items: center; gap: 60px; justify-content: center; flex-wrap: wrap; }
+        .iphone { width: 280px; height: 560px; background: var(--surface2); border-radius: 44px; border: 3px solid var(--border); position: relative; flex-shrink: 0; overflow: hidden; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(139, 92, 246, 0.08); }
+        .iphone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 28px; background: var(--surface2); border-radius: 0 0 16px 16px; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .iphone-notch .cam { width: 10px; height: 10px; background: #1a1a2e; border-radius: 50%; border: 1px solid var(--border); }
+        .iphone-notch .speaker { width: 40px; height: 4px; background: #1a1a2e; border-radius: 4px; }
+        .iphone-screen { position: absolute; top: 28px; left: 0; right: 0; bottom: 0; background: var(--bg); overflow-y: auto; padding: 16px 14px; }
+        .iphone-screen::-webkit-scrollbar { width: 0; }
+        .iphone-status { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+        .iphone-app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .iphone-app-header .logo-small { width: 28px; height: 28px; background: var(--gradient); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .iphone-app-header span { font-weight: 700; font-size: 13px; }
+        .iphone-app-header .status-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+        .iphone-hero-small { text-align: center; padding: 12px 0; }
+        .iphone-hero-small h4 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+        .iphone-hero-small p { font-size: 10px; color: var(--text-muted); }
+        .iphone-btn-small { display: block; background: var(--gradient); color: #fff; text-align: center; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; margin: 12px 0; }
+        .iphone-feature-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+        .iphone-feature-row .icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; background: rgba(139, 92, 246, 0.15); flex-shrink: 0; }
+        .iphone-feature-row .text { flex: 1; }
+        .iphone-feature-row .text strong { font-size: 11px; display: block; }
+        .iphone-feature-row .text span { font-size: 9px; color: var(--text-muted); }
+        .iphone-tab-bar { display: flex; justify-content: space-around; padding: 8px 0 0; border-top: 1px solid var(--border); margin-top: 12px; }
+        .iphone-tab-bar span { font-size: 16px; opacity: 0.5; }
+        .iphone-tab-bar span.active { opacity: 1; }
+        .app-info { flex: 1; min-width: 280px; max-width: 500px; }
+        .app-info h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, #f1f5f9 0%, #a78bfa 50%, #c4b5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .app-info p { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.7; }
+        .app-features-list { list-style: none; margin-bottom: 28px; }
+        .app-features-list li { padding: 6px 0; font-size: 14px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .app-features-list li::before { content: '✓'; color: var(--accent); font-weight: 700; }
+        .beta-section { text-align: center; padding: 60px 0 20px; }
+        .beta-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+        .beta-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 28px 32px; transition: all 0.3s; min-width: 200px; flex: 1; max-width: 260px; }
+        .beta-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); }
+        .beta-card .icon-big { font-size: 36px; margin-bottom: 12px; }
+        .beta-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .beta-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+        .beta-card .btn { width: 100%; justify-content: center; }
+        .beta-note { font-size: 12px; color: var(--text-muted); margin-top: 20px; }
+        footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 13px; }
+        footer a { color: var(--primary-glow); text-decoration: none; }
+        @media (max-width: 768px) {
+            .nav-links { gap: 14px; }
+            .nav-links a { font-size: 13px; }
+            .hero { padding: 50px 0 30px; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .compare-table { font-size: 12px; }
+            .compare-table th, .compare-table td { padding: 12px 10px; }
+            .news-grid { grid-template-columns: 1fr; }
+            .toast { left: 24px; right: 24px; bottom: 16px; }
+            .iphone { width: 220px; height: 440px; }
+            .app-layout { gap: 30px; }
+            .beta-cards { flex-direction: column; align-items: center; }
+            .beta-card { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeAuth()">✕</button>
+            <h2 id="modalTitle">Войти</h2>
+            <p class="sub" id="modalSub">Добро пожаловать обратно</p>
+            <form id="authForm" onsubmit="return handleAuth(event)">
+                <div class="form-group" id="nameGroup" style="display:none;"><label>Имя</label><input type="text" id="regName" placeholder="Как тебя зовут?" autocomplete="off"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="authEmail" placeholder="tensor@example.com" required autocomplete="off"></div>
+                <div class="form-group"><label>Пароль</label><input type="password" id="authPassword" placeholder="Минимум 6 символов" required minlength="6" autocomplete="off"></div>
+                <p class="error-msg" id="authError"></p>
+                <button type="submit" class="btn btn-primary" id="authSubmitBtn">Войти</button>
+            </form>
+            <p class="switch" id="switchText">Нет аккаунта? <a onclick="toggleAuthMode()">Зарегистрироваться</a></p>
+        </div>
+    </div>
+
+    <div class="modal-overlay cart-modal" id="cartModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeCart()">✕</button>
+            <h2>🛒 Корзина</h2>
+            <p class="sub">Товары в корзине</p>
+            <div id="cartContent"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeCheckout()">✕</button>
+            <h2 id="checkoutTitle">Оплата</h2>
+            <p class="sub">Заполни данные для оплаты</p>
+            <form id="checkoutForm" onsubmit="return handleCheckout(event)">
+                <div class="form-group"><label>Номер карты</label><input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="off" oninput="this.value=this.value.replace(/[^\d]/g,'').replace(/(\d{4})(?=\d)/g,'$1 ').trim()"></div>
+                <div class="form-group" style="display:flex;gap:12px;"><div style="flex:1;"><label>Срок</label><input type="text" id="cardExpiry" placeholder="ММ/ГГ" maxlength="5" autocomplete="off"></div><div style="flex:1;"><label>CVV</label><input type="text" id="cardCvv" placeholder="123" maxlength="3" autocomplete="off"></div></div>
+                <div class="form-group"><label>Имя владельца</label><input type="text" id="cardName" placeholder="IVAN IVANOV" autocomplete="off"></div>
+                <p class="error-msg" id="checkoutError"></p>
+                <div style="display:flex;gap:12px;margin-top:8px;"><button type="button" class="btn btn-outline" onclick="closeCheckout()" style="flex:1;">Отмена</button><button type="submit" class="btn btn-success" id="payBtn" style="flex:1;">💳 Оплатить</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span class="toast-icon">✅</span>
+        <span class="toast-text" id="toastText"></span>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="logo" onclick="navigateTo('home')"><div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="#fff" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Tensor VPN</div>
+            <nav class="nav-links" id="navLinks">
+                <a onclick="navigateTo('home')" class="active" data-page="home">Главная</a>
+                <a onclick="navigateTo('news')" data-page="news">Новости</a>
+                <a onclick="scrollToSection('pricing')" data-section="pricing">Тарифы</a>
+                <a onclick="scrollToSection('compare')" data-section="compare">Сравнение</a>
+                <a onclick="navigateTo('app')" data-page="app">Приложение</a>
+                <button class="cart-btn" onclick="openCart()" title="Корзина">🛒<span class="cart-badge" id="cartBadge">0</span></button>
+                <a class="btn btn-outline btn-sm" id="authBtn" onclick="openAuth()">Войти</a>
+                <a class="btn btn-primary btn-sm" id="regBtn" onclick="openAuth('reg')">Регистрация</a>
+            </nav>
+            <div class="user-badge" id="userBadge" onclick="logout()"><div class="user-avatar" id="userAvatar">T</div><span class="user-name" id="userNameDisplay">Пользователь</span></div>
+        </div>
+    </header>
+
+    <div class="page active" id="page-home">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-badge"><span class="dot"></span> Более 300 активных пользователей</div>
+                <h1>Загрузи свободу<br>с Tensor VPN</h1>
+                <p>Быстрый, анонимный и недорогой VPN для молодёжи. YouTube, Telegram, TikTok и другие сервисы, заблокированные в России — без лагов, рекламы и слежки.</p>
+                <div class="hero-buttons"><a class="btn btn-primary btn-lg" onclick="scrollToSection('pricing')">⚡ Выбрать тариф</a><a class="btn btn-outline btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Узнать больше ↓</a></div>
+            </div>
+        </section>
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-label">Почему Tensor</div>
+                <div class="section-title">Ни рекламы. Ни логов.<br>Ни тормозов.</div>
+                <div class="features-grid">
+                    <div class="feature-card"><div class="feature-icon">🔒</div><h3>No Logs Policy</h3><p>Мы не храним логи. Вообще. Ни строчки. Твой трафик — только твой.</p></div>
+                    <div class="feature-card"><div class="feature-icon">⚡</div><h3>Скорость без границ</h3><p>Серверы в Москве и Санкт-Петербурге. Минимальный пинг, никаких лагов.</p></div>
+                    <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Современное шифрование</h3><p>WireGuard и VLESS протоколы. Твой интернет под надёжной защитой.</p></div>
+                    <div class="feature-card"><div class="feature-icon">📱</div><h3>Все устройства</h3><p>iOS, Android, Windows, macOS. До 5 устройств на Pro-тарифе.</p></div>
+                    <div class="feature-card"><div class="feature-icon">🌍</div><h3>Доступ к заблокированным сервисам</h3><p>YouTube, Telegram, TikTok и другие сервисы, заблокированные в России — открываются в один клик.</p></div>
+                    <div class="feature-card"><div class="feature-icon">👥</div><h3>Приведи друга</h3><p>Реферальная программа: друг регистрируется — ты получаешь 30 минут Pro бесплатно.</p></div>
+                </div>
+            </div>
+        </section>
+        <section class="pricing" id="pricing">
+            <div class="container">
+                <div class="section-label">Тарифы</div>
+                <div class="section-title">Дешевле кофе,<br>быстрее света</div>
+                <div class="pricing-grid">
+                    <div class="pricing-card"><h3>🚀 Free</h3><div class="price">0 ₽<span>/мес</span></div><div class="price-sub">Ознакомительный режим</div><ul><li>500 МБ трафика в день</li><li>1 устройство</li><li>Базовые сервисы</li><li>Стандартная скорость</li></ul><a class="btn btn-outline" onclick="openAuth('reg')">Начать бесплатно</a></div>
+                    <div class="pricing-card"><h3>💜 Lite</h3><div class="price">149 ₽<span>/мес</span></div><div class="price-sub">Для повседневного использования</div><ul><li>Безлимитный трафик</li><li>1 устройство</li><li>YouTube, Telegram, TikTok и другие сервисы, заблокированные в России</li><li>Высокая скорость</li></ul><button class="btn btn-outline" onclick="addToCart('lite', '💜 Lite', 149)">🛒 В корзину</button></div>
+                    <div class="pricing-card popular"><div class="popular-badge">🔥 Самый выгодный</div><h3>👑 Pro</h3><div class="price">199 ₽<span>/мес</span></div><div class="price-sub">Максимум возможностей</div><ul><li>Безлимитный трафик</li><li>До 5 устройств</li><li>YouTube, Telegram, TikTok и другие сервисы, заблокированные в России</li><li>ChatGPT и нейросети без ограничений</li><li>Максимальная скорость</li></ul><button class="btn btn-primary" onclick="addToCart('pro', '👑 Pro', 199)">🛒 В корзину</button></div>
+                    <div class="pricing-card"><h3>💎 Pro Год</h3><div class="price">1 490 ₽<span>/год</span></div><div class="price-sub">Экономия 35% — как 124 ₽/мес</div><ul><li>Всё из Pro-тарифа</li><li>До 5 устройств</li><li>YouTube, Telegram, TikTok и другие сервисы, заблокированные в России</li><li>ChatGPT без ограничений</li></ul><button class="btn btn-outline" onclick="addToCart('pro-year', '💎 Pro Год', 1490)">🛒 В корзину</button></div>
+                </div>
+            </div>
+        </section>
+        <section class="compare" id="compare">
+            <div class="container">
+                <div class="section-label">Сравнение</div>
+                <div class="section-title">Tensor против других</div>
+                <div style="overflow-x: auto;">
+                    <table class="compare-table">
+                        <thead><tr><th>Критерий</th><th>Бесплатные VPN</th><th>Дорогие VPN</th><th style="color: var(--primary-glow);">Tensor VPN</th></tr></thead>
+                        <tbody>
+                            <tr><td>Цена</td><td>0 ₽ (но вы товар)</td><td class="cross">400–600 ₽/мес</td><td class="check">149–199 ₽/мес</td></tr>
+                            <tr><td>Логирование</td><td class="cross">Продают данные</td><td class="cross">Не всегда честны</td><td class="check">No Logs. 100%</td></tr>
+                            <tr><td>Реклама</td><td class="cross">Баннеры</td><td class="check">Нет</td><td class="check">Нет</td></tr>
+                            <tr><td>Скорость</td><td class="cross">Ограничена</td><td class="check">Высокая</td><td class="check">Максимальная</td></tr>
+                            <tr><td>ChatGPT</td><td class="cross">Заблокирован</td><td class="check">Работает</td><td class="check">Работает</td></tr>
+                            <tr><td>Устройства</td><td>1</td><td>До 10</td><td class="check">До 5 (Pro)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <section class="cta">
+            <div class="container"><div class="cta-card"><h2>Готов загрузить свободу? 🚀</h2><p>Подключи Tensor VPN за 2 минуты. Без логов, без рекламы, без тормозов.</p><a class="btn btn-primary btn-lg" onclick="scrollToSection('pricing')">⚡ Выбрать тариф</a></div></div>
+        </section>
+    </div>
+
+    <div class="page" id="page-news">
+        <section class="news">
+            <div class="container">
+                <div class="section-label">Новости</div>
+                <div class="section-title">Что нового в Tensor VPN</div>
+                <div class="news-grid">
+                    <div class="news-card"><div class="news-date">08.06.2026</div><h3>Запуск новых серверов в Москве</h3><p>Добавили два новых сервера. Пинг снизился на 40%, скорость до 1 Гбит/с.</p><span class="news-tag">Серверы</span></div>
+                    <div class="news-card"><div class="news-date">05.06.2026</div><h3>ChatGPT снова доступен на Pro</h3><p>Обновили протоколы. ChatGPT и другие нейросети работают стабильно.</p><span class="news-tag">Нейросети</span></div>
+                    <div class="news-card"><div class="news-date">01.06.2026</div><h3>Tensor VPN на Android TV</h3><p>Приложение для телевизоров. YouTube на большом экране.</p><span class="news-tag">Релиз</span></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="page" id="page-app">
+        <section class="app-prototype">
+            <div class="container">
+                <div class="section-label">Приложение</div>
+                <div class="app-layout">
+                    <div class="iphone">
+                        <div class="iphone-notch"><div class="speaker"></div><div class="cam"></div></div>
+                        <div class="iphone-screen">
+                            <div class="iphone-status"><span>9:41</span><span>📶 🔋</span></div>
+                            <div class="iphone-app-header"><div class="logo-small"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="#fff" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div><span>Tensor VPN</span><div class="status-dot"></div></div>
+                            <div class="iphone-hero-small"><h4>Загрузи свободу</h4><p>Быстро. Анонимно. Надёжно.</p><div class="iphone-btn-small">⚡ Подключиться</div></div>
+                            <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">СТАТУС: <span style="color:var(--accent);font-weight:600;">● Защищён</span></div>
+                            <div class="iphone-feature-row"><div class="icon">🔒</div><div class="text"><strong>No Logs</strong><span>Твой трафик под защитой</span></div></div>
+                            <div class="iphone-feature-row"><div class="icon">⚡</div><div class="text"><strong>Скорость</strong><span>До 1 Гбит/с</span></div></div>
+                            <div class="iphone-feature-row"><div class="icon">🌍</div><div class="text"><strong>Сервер</strong><span>Москва · 12 мс</span></div></div>
+                            <div style="margin-top:10px;padding:8px;background:rgba(139,92,246,0.1);border-radius:10px;text-align:center;font-size:9px;color:var(--primary-glow);">🔥 Pro активен · ещё 27 дней</div>
+                            <div class="iphone-tab-bar"><span>🏠</span><span class="active">⚡</span><span>👤</span><span>⚙️</span></div>
+                        </div>
+                    </div>
+                    <div class="app-info">
+                        <h2>Tensor VPN<br>на твоём телефоне</h2>
+                        <p>Тот же твой любимый VPN, теперь в удобном приложении. Один клик — и ты в сети без ограничений.</p>
+                        <ul class="app-features-list">
+                            <li>Подключение в один тап</li>
+                            <li>Выбор сервера на карте</li>
+                            <li>Виджет статуса на экране</li>
+                            <li>Автозапуск при старте</li>
+                            <li>Тёмная тема</li>
+                        </ul>
+                        <a class="btn btn-primary btn-lg" onclick="navigateTo('app');setTimeout(function(){document.getElementById('beta').scrollIntoView({behavior:'smooth',block:'start'})},100)">📲 Скачать Beta</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="beta-section" id="beta">
+            <div class="container">
+                <div class="section-label">Beta-тест</div>
+                <div class="section-title">Попробуй первым</div>
+                <p style="color:var(--text-muted);margin-bottom:8px;font-size:15px;">Стань бета-тестером и получи Pro на 30 дней бесплатно</p>
+                <div class="beta-cards">
+                    <div class="beta-card"><div class="icon-big">🍎</div><h4>iOS</h4><p>iPhone · iPad · TestFlight</p><button class="btn btn-primary" onclick="showToast('📲 Ссылка на TestFlight отправлена на почту')">Скачать Beta</button></div>
+                    <div class="beta-card"><div class="icon-big">🤖</div><h4>Android</h4><p>.apk · Google Play</p><button class="btn btn-primary" onclick="showToast('📲 APK-файл скоро будет доступен')">Скачать Beta</button></div>
+                    <div class="beta-card"><div class="icon-big">💻</div><h4>Desktop</h4><p>Windows · macOS · Linux</p><button class="btn btn-primary" onclick="showToast('📲 Десктопная версия в разработке')">Скоро</button></div>
+                </div>
+                <p class="beta-note">* Beta-версия может содержать баги. Сообщай о них в Telegram @tensor_support</p>
+            </div>
+        </section>
+    </div>
+
+    <footer><div class="container"><p>© 2026 Tensor VPN. | <a href="#">Политика конфиденциальности</a> | <a href="#">Оферта</a></p><p style="margin-top:6px;">Сделано с любовью для свободного интернета 💜</p></div></footer>
+
+    <script>
+        var cart = JSON.parse(localStorage.getItem('tensorCart') || '[]');
+
+        function saveCart() {
+            localStorage.setItem('tensorCart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            var badge = document.getElementById('cartBadge');
+            if (cart.length > 0) {
+                badge.textContent = cart.length;
+                badge.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+            }
+        }
+
+        function addToCart(id, name, price) {
+            var existing = cart.find(function(item) { return item.id === id; });
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ id: id, name: name, price: price, qty: 1 });
+            }
+            saveCart();
+            showToast('🛒 ' + name + ' добавлен в корзину');
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(function(item) { return item.id !== id; });
+            saveCart();
+            renderCart();
+        }
+
+        function getCartTotal() {
+            var total = 0;
+            cart.forEach(function(item) { total += item.price * item.qty; });
+            return total;
+        }
+
+        function openCart() {
+            renderCart();
+            document.getElementById('cartModal').classList.add('open');
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').classList.remove('open');
+        }
+
+        function renderCart() {
+            var container = document.getElementById('cartContent');
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="cart-empty"><div class="big-icon">🛒</div><p>Корзина пуста</p><p style="font-size:13px;margin-top:8px;">Добавь тариф и возвращайся!</p></div>';
+                return;
+            }
+            var html = '';
+            cart.forEach(function(item) {
+                html += '<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">' + item.name + '</div><div class="cart-item-desc">' + item.qty + ' × ' + item.price + ' ₽</div></div><div class="cart-item-price">' + (item.price * item.qty) + ' ₽</div><button class="cart-item-remove" onclick="removeFromCart(\'' + item.id + '\')">✕</button></div>';
+            });
+            html += '<div class="cart-total"><span class="cart-total-label">Итого:</span><span class="cart-total-price">' + getCartTotal() + ' ₽</span></div>';
+            html += '<button class="btn btn-success" onclick="proceedToCheckout()" style="margin-top:16px;">💳 Перейти к оплате</button>';
+            container.innerHTML = html;
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) return;
+            closeCart();
+            document.getElementById('checkoutModal').classList.add('open');
+            document.getElementById('checkoutError').style.display = 'none';
+            document.getElementById('checkoutForm').reset();
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkoutModal').classList.remove('open');
+        }
+
+        function handleCheckout(e) {
+            e.preventDefault();
+            var card = document.getElementById('cardNumber').value.trim();
+            var expiry = document.getElementById('cardExpiry').value.trim();
+            var cvv = document.getElementById('cardCvv').value.trim();
+            var name = document.getElementById('cardName').value.trim();
+            document.getElementById('checkoutError').style.display = 'none';
+            if (!card || !expiry || !cvv || !name) {
+                document.getElementById('checkoutError').textContent = 'Заполни все поля';
+                document.getElementById('checkoutError').style.display = 'block';
+                return false;
+            }
+            var total = getCartTotal();
+            cart = [];
+            saveCart();
+            closeCheckout();
+            showToast('✅ Оплачено ' + total + ' ₽. Тариф активирован!');
+            return false;
+        }
+
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            document.getElementById('toastText').innerHTML = msg;
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+
+        function navigateTo(p) {
+            document.querySelectorAll('.page').forEach(function(x) { x.classList.remove('active'); });
+            var t = document.getElementById('page-' + p);
+            if (t) t.classList.add('active');
+            document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+            document.querySelectorAll('.nav-links a[data-section]').forEach(function(a) { a.classList.remove('active'); });
+            if (p === 'home') {
+                document.getElementById('page-home').classList.add('active');
+                var h = document.querySelector('.nav-links a[data-page="home"]');
+                if (h) h.classList.add('active');
+            } else {
+                var n = document.querySelector('.nav-links a[data-page="' + p + '"]');
+                if (n) n.classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToSection(id) {
+            document.querySelectorAll('.page').forEach(function(x) { x.classList.remove('active'); });
+            document.getElementById('page-home').classList.add('active');
+            document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+            document.querySelectorAll('.nav-links a[data-section]').forEach(function(a) { a.classList.remove('active'); });
+            var n = document.querySelector('.nav-links a[data-section="' + id + '"]');
+            if (n) n.classList.add('active');
+            setTimeout(function() {
+                document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+
+        var isReg = false;
+
+        function openAuth(m) {
+            if (m === 'reg') {
+                isReg = true;
+                document.getElementById('modalTitle').textContent = 'Регистрация';
+                document.getElementById('modalSub').textContent = 'Создай аккаунт за 30 секунд';
+                document.getElementById('nameGroup').style.display = 'block';
+                document.getElementById('authSubmitBtn').textContent = 'Зарегистрироваться';
+                document.getElementById('switchText').innerHTML = 'Уже есть аккаунт? <a onclick="toggleAuthMode()">Войти</a>';
+            } else {
+                isReg = false;
+                document.getElementById('modalTitle').textContent = 'Войти';
+                document.getElementById('modalSub').textContent = 'Добро пожаловать обратно';
+                document.getElementById('nameGroup').style.display = 'none';
+                document.getElementById('authSubmitBtn').textContent = 'Войти';
+                document.getElementById('switchText').innerHTML = 'Нет аккаунта? <a onclick="toggleAuthMode()">Зарегистрироваться</a>';
+            }
+            document.getElementById('authModal').classList.add('open');
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('authForm').reset();
+        }
+
+        function closeAuth() {
+            document.getElementById('authModal').classList.remove('open');
+        }
+
+        function toggleAuthMode() {
+            openAuth(isReg ? null : 'reg');
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            var em = document.getElementById('authEmail').value.trim();
+            var pw = document.getElementById('authPassword').value;
+            var nm = isReg ? document.getElementById('regName').value.trim() : em.split('@')[0];
+            document.getElementById('authError').style.display = 'none';
+            if (!em || !pw) {
+                document.getElementById('authError').textContent = 'Заполни все поля';
+                document.getElementById('authError').style.display = 'block';
+                return false;
+            }
+            if (isReg && !nm) {
+                document.getElementById('authError').textContent = 'Введи имя';
+                document.getElementById('authError').style.display = 'block';
+                return false;
+            }
+            if (pw.length < 6) {
+                document.getElementById('authError').textContent = 'Минимум 6 символов';
+                document.getElementById('authError').style.display = 'block';
+                return false;
+            }
+            localStorage.setItem('tensorUser', JSON.stringify({ name: nm, email: em }));
+            updateUI(nm);
+            closeAuth();
+            navigateTo('home');
+            return false;
+        }
+
+        function logout() {
+            if (confirm('Выйти из аккаунта?')) {
+                localStorage.removeItem('tensorUser');
+                updateUI(null);
+                navigateTo('home');
+            }
+        }
+
+        function updateUI(u) {
+            var b = document.getElementById('userBadge');
+            var ab = document.getElementById('authBtn');
+            var rb = document.getElementById('regBtn');
+            if (u) {
+                document.getElementById('userNameDisplay').textContent = u;
+                document.getElementById('userAvatar').textContent = u.charAt(0).toUpperCase();
+                b.style.display = 'flex';
+                ab.style.display = 'none';
+                rb.style.display = 'none';
+            } else {
+                b.style.display = 'none';
+                ab.style.display = '';
+                rb.style.display = '';
+            }
+        }
+
+        (function() {
+            var user = JSON.parse(localStorage.getItem('tensorUser') || '{}');
+            if (user.name) updateUI(user.name);
+            updateCartBadge();
+        })();
+    </script>
+</body>
+</html>

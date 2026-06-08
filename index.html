@@ -308,4 +308,15 @@
                 document.getElementById('userNameDisplay').textContent = u;
                 document.getElementById('userAvatar').textContent = u.charAt(0).toUpperCase();
                 b.style.display = 'flex'; ab.style.display = 'none'; rb.style.display = 'none';
-            } else {
+                  b.style.display = 'none'; ab.style.display = 'inline-flex'; rb.style.display = 'inline-flex';
+            }
+        }
+        document.getElementById('authModal').addEventListener('click', function(e) { if (e.target === this) closeAuth(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAuth(); });
+        window.addEventListener('DOMContentLoaded', function() {
+            var saved = localStorage.getItem('tensorUser');
+            if (saved) updateUI(JSON.parse(saved).name);
+        });
+    </script>
+</body>
+</html>
